@@ -8,10 +8,6 @@ const notion = new Client({
   auth: process.env.NOTION_SECTRET,
 });
 
-//www.notion.so/Database-39adbaad965d4517a5677d3b92cf6afd
-
-//www.notion.so/Getting-Started-d1302c65469740e1a49d28957e39fafa
-
 const NotionService = () => {
   const getDatabase = async () => {
     try {
@@ -34,9 +30,19 @@ const NotionService = () => {
     };
   };
 
+  const getBlocks = async (block_id: string) => {
+    const blocks = await notion.blocks.children.list({
+      block_id,
+      page_size: 100,
+    });
+
+    return blocks.results;
+  };
+
   return {
     getDatabase,
     sanitizePage,
+    getBlocks,
   };
 };
 

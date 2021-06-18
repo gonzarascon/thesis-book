@@ -13,6 +13,8 @@ const GenerateAliases = async () => {
     path.join(process.cwd(), "data/aliases.json"),
     JSON.stringify(parsedObjects)
   );
+
+  return { allPages, parsedObjects };
 };
 
 export default GenerateAliases;

@@ -1,24 +1,52 @@
-import { GetStaticProps } from "next";
+import { Page, TitlePropertyValue } from "@notionhq/client/build/src/api-types";
+import { GetStaticProps, NextPage } from "next";
 import Link from "next/link";
-import Layout from "../components/Layout";
 import GenerateAliases from "utils/generate-aliases";
 
-const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
+type IncomingProps = {
+  pages: Page[];
+  parsedURLs: {
+    id: string;
+    slug: string;
+  }[];
+};
+
+const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs }) => (
+  <>
     <h1>Hello Next.js 👋</h1>
+    <section className="flex">
+      {pages.map((page) => {
+        const pageProperty = page.properties.Page as TitlePropertyValue;
+
+        return (
+          <Link
+            href={parsedURLs.find((url) => url.id === page.id)?.slug || "/"}
+          >
+            <a className="rounded-md shadow-lg p-6" key={page.id}>
+              <h2 className="text-xl font-bold font-heading">
+                {pageProperty.title[0].plain_text}
+              </h2>
+            </a>
+          </Link>
+        );
+      })}
+    </section>
     <p>
       <Link href="/about">
         <a>About</a>
       </Link>
     </p>
-  </Layout>
+  </>
 );
 
 export const getStaticProps: GetStaticProps = async () => {
-  await GenerateAliases(); // On build, generate all slug/id references for pages
+  const { allPages, parsedObjects } = await GenerateAliases(); // On build, generate all slug/id references for pages
 
   return {
-    props: {},
+    props: {
+      pages: allPages,
+      parsedURLs: parsedObjects,
+    },
   };
 };
 
