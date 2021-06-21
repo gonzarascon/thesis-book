@@ -1,8 +1,8 @@
-import { Client } from "@notionhq/client";
+import { Client } from '@notionhq/client';
 import {
   Page,
   RichTextPropertyValue,
-} from "@notionhq/client/build/src/api-types";
+} from '@notionhq/client/build/src/api-types';
 
 const notion = new Client({
   auth: process.env.NOTION_SECTRET,
@@ -30,6 +30,12 @@ const NotionService = () => {
     };
   };
 
+  const getPage = async (page_id: string) => {
+    return await notion.pages.retrieve({
+      page_id,
+    });
+  };
+
   const getBlocks = async (block_id: string) => {
     const blocks = await notion.blocks.children.list({
       block_id,
@@ -43,6 +49,7 @@ const NotionService = () => {
     getDatabase,
     sanitizePage,
     getBlocks,
+    getPage,
   };
 };
 
