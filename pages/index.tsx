@@ -1,7 +1,6 @@
 import { Page, TitlePropertyValue } from '@notionhq/client/build/src/api-types';
 import { GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
-import GenerateAliases from 'utils/generate-aliases';
 
 type IncomingProps = {
   pages: Page[];
@@ -55,12 +54,13 @@ const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs }) => (
 );
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { allPages, parsedObjects } = await GenerateAliases(); // On build, generate all slug/id references for pages
+  const { allPages } = await import('data/pages.json');
+  const { aliases } = await import('data/aliases.json');
 
   return {
     props: {
       pages: allPages,
-      parsedURLs: parsedObjects,
+      parsedURLs: aliases,
     },
   };
 };
