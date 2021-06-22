@@ -1,7 +1,9 @@
 import { Client } from '@notionhq/client';
 import {
+  NumberPropertyValue,
   Page,
   RichTextPropertyValue,
+  TitlePropertyValue,
 } from '@notionhq/client/build/src/api-types';
 
 const notion = new Client({
@@ -13,6 +15,9 @@ const NotionService = () => {
     try {
       const res = await notion.databases.query({
         database_id: process.env.NOTION_DB,
+        sorts:[
+          {property:'Order',direction:'ascending'}
+        ]
       });
 
       return res.results;
@@ -22,11 +27,15 @@ const NotionService = () => {
   };
 
   const sanitizePage = (page: Page) => {
+    const title =  page.properties.Page as TitlePropertyValue;
     const slug = page.properties.Slug as RichTextPropertyValue;
+
+    console.info(`Sanitizing data for ${title.title[0].plain_text}`)
 
     return {
       id: page.id,
       slug: slug.rich_text[0].plain_text, // Nasty way to access this value.
+      title: title.title[0].plain_text
     };
   };
 

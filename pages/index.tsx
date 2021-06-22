@@ -1,48 +1,45 @@
 import { Page, TitlePropertyValue } from '@notionhq/client/build/src/api-types';
 import { GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
+import cx from 'clsx';
+import NotionService from 'lib/Notion';
+import { render, Block } from '@9gustin/react-notion-render';
+import { ParsedPage } from 'types/ParsedPage';
 
 type IncomingProps = {
+  content: Block[];
   pages: Page[];
-  parsedURLs: {
-    id: string;
-    slug: string;
-  }[];
+  parsedURLs: ParsedPage[];
 };
 
-const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs }) => (
+const cardClasses = (index: number) =>
+  cx(
+    'flex items-center p-6 text-2xl transition-all font-heading border-l-4 w-full shadow-lg rounded-sm hover:bg-gray-50',
+    {
+      'border-purple-500 hover:border-purple-600': index === 0,
+    },
+    {
+      'border-yellow-500 hover:border-yellow-600': index === 1,
+    }
+  );
+
+const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs, content }) => (
   <section className="max-w-2xl mx-auto">
-    <p className="mb-12">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Error assumenda
-      facilis, nemo esse corrupti recusandae inventore omnis odio, ipsum,
-      perferendis nobis autem? Omnis quos cupiditate expedita incidunt nulla,
-      necessitatibus voluptates? Accusantium numquam est blanditiis aut harum in
-      ullam ipsa, ducimus mollitia quisquam laboriosam accusamus! Enim, sequi ea
-      distinctio asperiores, tempora et sapiente consequatur eaque omnis dolore
-      eos ducimus atque quo! Debitis tempora quaerat qui ipsam dolorem soluta
-      quod, quo odio laborum consequuntur perspiciatis eveniet, quidem
-      repudiandae est cumque nemo aut inventore adipisci eius corporis? Nulla
-      non quisquam rerum harum iure? Distinctio sapiente at magni amet dolorem
-      ab id cum tenetur provident magnam eaque modi natus pariatur, ipsum
-      tempora quisquam perferendis recusandae mollitia facere nulla maxime, in
-      sint? Repellat, nam sit! Ipsam rerum dolore inventore in porro,
-      voluptatibus omnis repellendus quia quas reiciendis? Dolor, iusto ea?
-      Obcaecati laborum nobis molestiae suscipit ducimus quas impedit excepturi,
-      perspiciatis, quae enim accusamus atque deleniti.
-    </p>
-    <div className="flex items-center">
-      {pages.map((page) => {
+    <article className="prose prose-purple">{render(content)}</article>
+    <h3 className="my-8 text-xl text-center text-gray-700 font-heading">
+      Contenidos:
+    </h3>
+    <div className="flex flex-col items-center space-y-4">
+      {pages.map((page, index) => {
         const pageProperty = page.properties.Page as TitlePropertyValue;
 
         return (
           <Link
             href={parsedURLs.find((url) => url.id === page.id)?.slug || '/'}
+            key={page.id}
           >
-            <a
-              className="flex items-center h-32 p-6 text-2xl rounded-md shadow-lg font-heading group"
-              key={page.id}
-            >
-              <h2 className="font-bold text-transparent bg-black font-heading group-hover:bg-gradient-to-b group-hover:from-purple-300 group-hover:to-purple-500 bg-clip-text">
+            <a className={cardClasses(index)}>
+              <h2 className="text-lg font-heading">
                 {pageProperty.title[0].plain_text}
               </h2>
             </a>
@@ -57,9 +54,19 @@ export const getStaticProps: GetStaticProps = async () => {
   const { allPages } = await import('data/pages.json');
   const { aliases } = await import('data/aliases.json');
 
+  // Filter first page that includes home data.
+  const filteredPages = allPages.filter(
+    (page) => page.properties.Order.number !== 0
+  );
+
+  const homepage = allPages.find((page) => page.properties.Order.number === 0);
+
+  const homeData = await NotionService().getBlocks(homepage.id);
+
   return {
     props: {
-      pages: allPages,
+      content: homeData,
+      pages: filteredPages,
       parsedURLs: aliases,
     },
   };

@@ -1,41 +1,73 @@
 import NotionService from 'lib/Notion';
 import { GetStaticProps, NextPage } from 'next';
+import Image from 'next/image';
 import { render, Block } from '@9gustin/react-notion-render';
-import { Page, TitlePropertyValue } from '@notionhq/client/build/src/api-types';
+import {
+  Page,
+  TitlePropertyValue,
+  URLPropertyValue,
+} from '@notionhq/client/build/src/api-types';
 import Breadcrumb from 'components/Breadcrumb';
+import { ParsedPage } from 'types/ParsedPage';
+import Paginator from 'components/Paginator';
 
 type IncomingProps = {
   slug: string;
   blockMap: Block[];
   pageData: Page;
+  nextEntry: ParsedPage;
+  prevEntry: ParsedPage;
 };
 
-const IndexPage: NextPage<IncomingProps> = ({ slug, blockMap, pageData }) => {
-  console.log(pageData);
-
+const IndexPage: NextPage<IncomingProps> = ({
+  blockMap,
+  pageData,
+  prevEntry,
+  nextEntry,
+}) => {
   const { properties } = pageData;
 
   const titleProperty = properties.Page as TitlePropertyValue;
+  const bannerProperty = properties.Banner as URLPropertyValue;
 
   const pageTitle = titleProperty.title[0].plain_text;
+  const pageBanner = bannerProperty.url;
 
   return (
     <section className="max-w-2xl mx-auto space-y-6">
       <Breadcrumb activeRoute={pageTitle} />
+      <div className="relative w-full h-60">
+        <Image
+          src={pageBanner}
+          blurDataURL={pageBanner}
+          layout="fill"
+          placeholder="blur"
+          objectFit="cover"
+          className="rounded max-h-36"
+          alt={pageTitle}
+        />
+      </div>
       <h2 className="text-4xl font-bold text-gray-700 font-heading">
         {pageTitle}
       </h2>
       <article className="prose prose-lg prose-purple">
         {render(blockMap)}
       </article>
+      <Paginator next={nextEntry} prev={prevEntry} />
     </section>
   );
 };
 
 export async function getStaticPaths() {
+  const { aliases } = await import('data/aliases.json').catch(() => {
+    throw new Error(
+      '`aliases.json` file not found, please run `yarn generate-data` in order to create it.'
+    );
+  });
+
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: aliases.map((alias) => ({ params: { slug: alias.slug } })),
+    fallback: false,
   };
 }
 
@@ -44,15 +76,25 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
   let blockMap = null;
   let pageData = null;
+  let prevEntry = null;
+  let nextEntry = null;
 
   const { aliases } = await import('data/aliases.json').catch(() => {
     throw new Error(
-      "`aliases.json` file not found, please run development server and navigate to '/' in order to create it."
+      '`aliases.json` file not found, please run `yarn generate-data` in order to create it.'
     );
   });
 
   if (aliases.length) {
     const current = aliases.find((alias) => alias.slug === slug);
+
+    const currentIndex = aliases.findIndex((alias) => alias === current);
+
+    if (currentIndex >= 1) {
+      nextEntry = aliases[currentIndex + 1] || null;
+
+      prevEntry = currentIndex === 1 ? null : aliases[currentIndex - 1];
+    }
 
     if (current?.id) {
       pageData = await NotionService().getPage(current.id);
@@ -65,6 +107,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       slug,
       pageData,
       blockMap,
+      nextEntry,
+      prevEntry,
     },
   };
 };
