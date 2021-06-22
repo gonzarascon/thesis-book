@@ -39,9 +39,7 @@ const IndexPage: NextPage<IncomingProps> = ({
       <div className="relative w-full h-60">
         <Image
           src={pageBanner}
-          blurDataURL={pageBanner}
           layout="fill"
-          placeholder="blur"
           objectFit="cover"
           className="rounded max-h-36"
           alt={pageTitle}
@@ -90,11 +88,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const currentIndex = aliases.findIndex((alias) => alias === current);
 
-    if (currentIndex >= 1) {
-      nextEntry = aliases[currentIndex + 1] || null;
-
-      prevEntry = currentIndex === 1 ? null : aliases[currentIndex - 1];
-    }
+    nextEntry = aliases[currentIndex + 1] || null;
+    prevEntry = aliases[currentIndex - 1] || null;
 
     if (current?.id) {
       pageData = await NotionService().getPage(current.id);
