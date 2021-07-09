@@ -19,7 +19,22 @@ const cardClasses = (index: number) =>
       'border-purple-500 hover:border-purple-600': index === 0,
     },
     {
-      'border-yellow-500 hover:border-yellow-600': index === 1,
+      'border-indigo-500 hover:border-indigo-600': index === 1,
+    },
+    {
+      'border-blue-500 hover:border-blue-600': index === 2,
+    },
+    {
+      'border-green-500 hover:border-green-600': index === 3,
+    },
+    {
+      'border-yellow-500 hover:border-yellow-600': index === 4,
+    },
+    {
+      'border-red-500 hover:border-red-600': index === 5,
+    },
+    {
+      'border-pink-500 hover:border-pink-600': index === 6,
     }
   );
 
