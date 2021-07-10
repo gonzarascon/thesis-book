@@ -9,7 +9,7 @@ type Props = {
   title?: string;
 };
 
-const Layout = ({ children, title = 'This is the default title' }: Props) => {
+const Layout = ({ children }: Props) => {
   const { pathname } = useRouter();
 
   const headerClasses = cx(
@@ -23,7 +23,6 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Head>
-        <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>

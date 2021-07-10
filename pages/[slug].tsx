@@ -10,6 +10,7 @@ import {
 import Breadcrumb from 'components/Breadcrumb';
 import { ParsedPage } from 'types/ParsedPage';
 import Paginator from 'components/Paginator';
+import Head from 'next/head';
 
 type IncomingProps = {
   slug: string;
@@ -19,7 +20,7 @@ type IncomingProps = {
   prevEntry: ParsedPage;
 };
 
-const IndexPage: NextPage<IncomingProps> = ({
+const SectionPage: NextPage<IncomingProps> = ({
   blockMap,
   pageData,
   prevEntry,
@@ -34,25 +35,33 @@ const IndexPage: NextPage<IncomingProps> = ({
   const pageBanner = bannerProperty.url;
 
   return (
-    <section className="max-w-2xl mx-auto space-y-6">
-      <Breadcrumb activeRoute={pageTitle} />
-      <div className="relative w-full h-60">
-        <Image
-          src={pageBanner}
-          layout="fill"
-          objectFit="cover"
-          className="rounded max-h-36"
-          alt={pageTitle}
-        />
-      </div>
-      <h2 className="text-4xl font-bold text-gray-700 font-heading">
-        {pageTitle}
-      </h2>
-      <article className="prose prose-lg prose-purple">
-        {render(blockMap)}
-      </article>
-      <Paginator next={nextEntry} prev={prevEntry} />
-    </section>
+    <>
+      <Head>
+        <title>
+          {pageTitle} — Learnground: La gamificación aplicada a plataformas de
+          E-learning
+        </title>
+      </Head>
+      <section className="max-w-2xl mx-auto space-y-6">
+        <Breadcrumb activeRoute={pageTitle} />
+        <div className="relative w-full h-60">
+          <Image
+            src={pageBanner}
+            layout="fill"
+            objectFit="cover"
+            className="rounded max-h-36"
+            alt={pageTitle}
+          />
+        </div>
+        <h2 className="text-4xl font-bold text-gray-700 font-heading">
+          {pageTitle}
+        </h2>
+        <article className="prose prose-lg prose-purple">
+          {render(blockMap)}
+        </article>
+        <Paginator next={nextEntry} prev={prevEntry} />
+      </section>
+    </>
   );
 };
 
@@ -108,4 +117,4 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   };
 };
 
-export default IndexPage;
+export default SectionPage;

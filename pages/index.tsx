@@ -7,6 +7,7 @@ import { render, Block } from '@9gustin/react-notion-render';
 import { ParsedPage } from 'types/ParsedPage';
 import Image from 'next/image';
 import hero from '../public/img/hero.jpg';
+import Head from 'next/head';
 
 type IncomingProps = {
   content: Block[];
@@ -41,40 +42,50 @@ const cardClasses = (index: number) =>
   );
 
 const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs, content }) => (
-  <section className="max-w-2xl mx-auto">
-    <div className="relative w-full">
-      <Image
-        src={hero}
-        alt="Piezas de rompecabezas"
-        className="w-full rounded-t-md"
-      />
-      <h1 className="bg-white mx-2.5 absolute -bottom-10 md:bottom-0 p-6 md:p-4 text-xl md:text-3xl left-0 font-bold">
-        Learnground: La gamificación aplicada a plataformas de E-learning.
-      </h1>
-    </div>
-    <article className="prose prose-purple">{render(content)}</article>
-    <h3 className="my-8 text-xl text-center text-gray-700 font-heading">
-      Contenidos:
-    </h3>
-    <div className="flex flex-col items-center space-y-4">
-      {pages.map((page, index) => {
-        const pageProperty = page.properties.Page as TitlePropertyValue;
+  <>
+    <Head>
+      <title>
+        Tesis de grado — Learnground: La gamificación aplicada a plataformas de
+        E-learning — Gonzalo Rascón
+      </title>
+    </Head>
+    <section className="max-w-2xl mx-auto">
+      <div className="relative w-full">
+        <Image
+          src={hero}
+          alt="Piezas de rompecabezas"
+          className="w-full rounded-t-md"
+          placeholder="blur"
+        />
+        <h1 className="bg-white mx-2.5 absolute -bottom-10 md:bottom-0 p-6 md:p-4 text-xl md:text-3xl left-0 font-bold">
+          Learnground: La gamificación aplicada a plataformas de E-learning.
+        </h1>
+      </div>
+      <article className="prose prose-purple">{render(content)}</article>
+      <h3 className="mt-8 text-xl text-center text-gray-700 font-heading">
+        Contenidos
+      </h3>
+      <span className="block h-1 max-w-xs mx-auto my-4 border-b border-gray-200"></span>
+      <div className="flex flex-col items-center space-y-4">
+        {pages.map((page, index) => {
+          const pageProperty = page.properties.Page as TitlePropertyValue;
 
-        return (
-          <Link
-            href={parsedURLs.find((url) => url.id === page.id)?.slug || '/'}
-            key={page.id}
-          >
-            <a className={cardClasses(index)}>
-              <h2 className="text-lg font-heading">
-                {pageProperty.title[0].plain_text}
-              </h2>
-            </a>
-          </Link>
-        );
-      })}
-    </div>
-  </section>
+          return (
+            <Link
+              href={parsedURLs.find((url) => url.id === page.id)?.slug || '/'}
+              key={page.id}
+            >
+              <a className={cardClasses(index)}>
+                <h2 className="text-lg font-heading">
+                  {pageProperty.title[0].plain_text}
+                </h2>
+              </a>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  </>
 );
 
 export const getStaticProps: GetStaticProps = async () => {
