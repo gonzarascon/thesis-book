@@ -5,6 +5,8 @@ import cx from 'clsx';
 import NotionService from 'lib/Notion';
 import { render, Block } from '@9gustin/react-notion-render';
 import { ParsedPage } from 'types/ParsedPage';
+import Image from 'next/image';
+import hero from '../public/img/hero.jpg';
 
 type IncomingProps = {
   content: Block[];
@@ -40,6 +42,16 @@ const cardClasses = (index: number) =>
 
 const IndexPage: NextPage<IncomingProps> = ({ pages, parsedURLs, content }) => (
   <section className="max-w-2xl mx-auto">
+    <div className="relative w-full">
+      <Image
+        src={hero}
+        alt="Piezas de rompecabezas"
+        className="w-full rounded-t-md"
+      />
+      <h1 className="bg-white mx-2.5 absolute -bottom-10 md:bottom-0 p-6 md:p-4 text-xl md:text-3xl left-0 font-bold">
+        Learnground: La gamificación aplicada a plataformas de E-learning.
+      </h1>
+    </div>
     <article className="prose prose-purple">{render(content)}</article>
     <h3 className="my-8 text-xl text-center text-gray-700 font-heading">
       Contenidos:
