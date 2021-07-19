@@ -8,3 +8,10 @@
 
 @tailwind components;
 @tailwind utilities;
+.rnr-italic {
+  @apply italic;
+}
+
+.rnr-italic {
+  @apply text-gray-400;
+}
